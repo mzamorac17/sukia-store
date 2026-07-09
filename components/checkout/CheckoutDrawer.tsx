@@ -1,8 +1,10 @@
 "use client";
 
+import { FormEvent, useState } from "react";
 import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { product } from "@/lib/product";
+import { supabase } from "@/lib/supabase";
 
 interface CheckoutDrawerProps {
   open: boolean;
@@ -15,6 +17,79 @@ export default function CheckoutDrawer({
   onClose,
   selectedSize,
 }: CheckoutDrawerProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    province: "",
+    canton: "",
+    district: "",
+    address: "",
+    notes: "",
+  });
+
+  function handleChange(
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) {
+    const { name, value } = event.target;
+
+    setFormData((currentData) => ({
+      ...currentData,
+      [name]: value,
+    }));
+  }
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+
+    const order = {
+      product_id: product.id,
+      product_name: product.name,
+      selected_size: selectedSize,
+      price: product.price,
+
+      full_name: formData.fullName,
+      email: formData.email,
+      phone: formData.phone,
+      province: formData.province,
+      canton: formData.canton,
+      district: formData.district,
+      address: formData.address,
+      notes: formData.notes,
+    };
+
+    const { error } = await supabase.from("orders").insert(order);
+
+    if (error) {
+      console.error("ORDER ERROR:", error);
+      alert("Hubo un problema guardando el pedido.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    alert("Pedido guardado correctamente.");
+
+    setFormData({
+      fullName: "",
+      email: "",
+      phone: "",
+      province: "",
+      canton: "",
+      district: "",
+      address: "",
+      notes: "",
+    });
+
+    setIsSubmitting(false);
+    onClose();
+  }
+
   return (
     <AnimatePresence>
       {open && (
@@ -42,6 +117,7 @@ export default function CheckoutDrawer({
               <button
                 onClick={onClose}
                 className="rounded-full border border-zinc-800 p-2 transition hover:border-white"
+                type="button"
               >
                 <X size={18} />
               </button>
@@ -65,42 +141,95 @@ export default function CheckoutDrawer({
               </p>
             </div>
 
-            <form className="mt-8 flex flex-1 flex-col gap-4">
+            <form
+              onSubmit={handleSubmit}
+              className="mt-8 flex flex-1 flex-col gap-4"
+            >
               <input
+                name="fullName"
+                value={formData.fullName}
+                onChange={handleChange}
                 type="text"
                 placeholder="Nombre completo"
+                required
                 className="border border-zinc-800 bg-transparent px-4 py-4 text-sm outline-none transition placeholder:text-zinc-600 focus:border-white"
               />
 
               <input
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
                 type="email"
                 placeholder="Correo electrónico"
+                required
                 className="border border-zinc-800 bg-transparent px-4 py-4 text-sm outline-none transition placeholder:text-zinc-600 focus:border-white"
               />
 
               <input
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
                 type="tel"
                 placeholder="Teléfono"
+                required
                 className="border border-zinc-800 bg-transparent px-4 py-4 text-sm outline-none transition placeholder:text-zinc-600 focus:border-white"
               />
 
               <input
+                name="province"
+                value={formData.province}
+                onChange={handleChange}
                 type="text"
                 placeholder="Provincia"
+                required
+                className="border border-zinc-800 bg-transparent px-4 py-4 text-sm outline-none transition placeholder:text-zinc-600 focus:border-white"
+              />
+
+              <input
+                name="canton"
+                value={formData.canton}
+                onChange={handleChange}
+                type="text"
+                placeholder="Cantón"
+                required
+                className="border border-zinc-800 bg-transparent px-4 py-4 text-sm outline-none transition placeholder:text-zinc-600 focus:border-white"
+              />
+
+              <input
+                name="district"
+                value={formData.district}
+                onChange={handleChange}
+                type="text"
+                placeholder="Distrito"
+                required
                 className="border border-zinc-800 bg-transparent px-4 py-4 text-sm outline-none transition placeholder:text-zinc-600 focus:border-white"
               />
 
               <textarea
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
                 placeholder="Dirección exacta"
-                rows={4}
+                rows={3}
+                required
+                className="resize-none border border-zinc-800 bg-transparent px-4 py-4 text-sm outline-none transition placeholder:text-zinc-600 focus:border-white"
+              />
+
+              <textarea
+                name="notes"
+                value={formData.notes}
+                onChange={handleChange}
+                placeholder="Notas adicionales / referencia"
+                rows={2}
                 className="resize-none border border-zinc-800 bg-transparent px-4 py-4 text-sm outline-none transition placeholder:text-zinc-600 focus:border-white"
               />
 
               <button
-                type="button"
-                className="mt-auto w-full rounded-md bg-white py-5 text-sm uppercase tracking-[0.25em] text-black transition hover:bg-zinc-200"
+                type="submit"
+                disabled={isSubmitting}
+                className="mt-auto w-full rounded-md bg-white py-5 text-sm uppercase tracking-[0.25em] text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Continuar al pago
+                {isSubmitting ? "Guardando..." : "Continuar al pago"}
               </button>
             </form>
           </motion.aside>
