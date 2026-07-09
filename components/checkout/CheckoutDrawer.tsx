@@ -20,19 +20,24 @@ export default function CheckoutDrawer({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    province: "",
-    canton: "",
-    district: "",
-    address: "",
-    notes: "",
-  });
+  fullName: "",
+  email: "",
+  phone: "",
+  province: "",
+  canton: "",
+  district: "",
+  address: "",
+  notes: "",
+  paymentMethod: "sinpe",
+  sinpeReference: "",
+  deliveryMethod: "shipping",
+});
 
   function handleChange(
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) {
+  event: React.ChangeEvent<
+    HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+  >
+) {
     const { name, value } = event.target;
 
     setFormData((currentData) => ({
@@ -62,6 +67,10 @@ export default function CheckoutDrawer({
       district: formData.district,
       address: formData.address,
       notes: formData.notes,
+
+      payment_method: formData.paymentMethod,
+      sinpe_reference: formData.sinpeReference,
+      delivery_method: formData.deliveryMethod,
     };
 
     const { error } = await supabase.from("orders").insert(order);
@@ -214,7 +223,62 @@ export default function CheckoutDrawer({
                 required
                 className="resize-none border border-zinc-800 bg-transparent px-4 py-4 text-sm outline-none transition placeholder:text-zinc-600 focus:border-white"
               />
+              <select
+  name="deliveryMethod"
+  value={formData.deliveryMethod}
+  onChange={handleChange}
+  required
+  className="border border-zinc-800 bg-[#080808] px-4 py-4 text-sm outline-none transition text-white focus:border-white"
+>
+  <option value="shipping">Envío a domicilio</option>
+  <option value="pickup">Retiro local</option>
+</select>
 
+<select
+  name="paymentMethod"
+  value={formData.paymentMethod}
+  onChange={handleChange}
+  required
+  className="border border-zinc-800 bg-[#080808] px-4 py-4 text-sm outline-none transition text-white focus:border-white"
+>
+  <option value="sinpe">SINPE Móvil</option>
+  <option value="cash">Efectivo / retiro local</option>
+  <option value="card">Tarjeta, próximamente</option>
+</select>
+
+{formData.paymentMethod === "sinpe" && (
+  <div className="border border-zinc-800 p-4">
+    <p className="text-xs uppercase tracking-[0.25em] text-zinc-500">
+      Pago por SINPE
+    </p>
+
+    <p className="mt-3 text-sm text-zinc-300">
+      Realiza el pago por SINPE Móvil por:
+    </p>
+
+    <p className="mt-3 text-2xl font-light">
+      ₡{product.price.toLocaleString("es-CR")}
+    </p>
+
+    <p className="mt-3 text-sm text-zinc-400">
+      Número SINPE: <span className="text-white">8571-1510</span>
+    </p>
+
+    <p className="mt-2 text-xs text-zinc-500">
+      En el detalle coloca: SUKIA {selectedSize}
+    </p>
+
+    <input
+      name="sinpeReference"
+      value={formData.sinpeReference}
+      onChange={handleChange}
+      type="text"
+      placeholder="Número de comprobante SINPE"
+      required={formData.paymentMethod === "sinpe"}
+      className="mt-4 w-full border border-zinc-800 bg-transparent px-4 py-4 text-sm outline-none transition placeholder:text-zinc-600 focus:border-white"
+    />
+  </div>
+)}
               <textarea
                 name="notes"
                 value={formData.notes}
