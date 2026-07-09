@@ -1,4 +1,6 @@
-export const product = {
+import { Product } from "@/types/product";
+
+export const product: Product = {
   id: 1,
 
   collection: "#001",
@@ -16,6 +18,4 @@ export const product = {
   sizes: ["XS", "S", "M", "L", "XL"],
 
   stock: 100,
-
-  currency: "CRC",
 };

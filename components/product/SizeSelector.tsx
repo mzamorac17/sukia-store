@@ -17,7 +17,7 @@ export default function SizeSelector({
         <button
           key={item}
           onClick={() => setSize(item)}
-          className={`h-12 w-12 border text-sm transition-all duration-300 ${
+          className={`h-14 w-14 border text-base transition-all duration-300 ${
             size === item
               ? "border-white bg-white text-black"
               : "border-zinc-700 text-white hover:border-white"

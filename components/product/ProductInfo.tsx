@@ -8,7 +8,7 @@ export default function ProductInfo() {
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="mt-12 text-xs uppercase tracking-[0.35em] text-zinc-500"
+        className="mt-12 text-lg uppercase tracking-[0.35em] text-zinc-500"
       >
         {product.collection}
       </motion.p>
@@ -17,8 +17,7 @@ export default function ProductInfo() {
         initial={{ opacity: 0, y: 25 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.35 }}
-        className="mt-3 text-center text-5xl tracking-[0.18em] md:text-6xl"
-        style={{ fontFamily: "Playfair Display" }}
+        className="mt-3 text-center font-heading text-6xl tracking-[0.16em] md:text-7xl"
       >
         {product.name}
       </motion.h1>
@@ -27,7 +26,7 @@ export default function ProductInfo() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="mt-3 text-sm uppercase tracking-[0.3em] text-zinc-500"
+        className="mt-3 text-base uppercase tracking-[0.3em] text-zinc-500"
       >
         {product.subtitle}
       </motion.p>
@@ -36,7 +35,7 @@ export default function ProductInfo() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.6 }}
-        className="mt-10 text-5xl font-light"
+        className="mt-10 text-6xl font-light"
       >
         ₡{product.price.toLocaleString("es-CR")}
       </motion.h2>
