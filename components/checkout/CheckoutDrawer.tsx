@@ -75,7 +75,25 @@ export default function CheckoutDrawer({
       delivery_method: formData.deliveryMethod,
     };
 
-    const { error } = await supabase.from("orders").insert(order);
+    const { error } = await supabase.rpc("create_order_with_inventory", {
+    p_product_id: order.product_id,
+    p_product_name: order.product_name,
+    p_selected_size: order.selected_size,
+    p_price: order.price,
+
+    p_full_name: order.full_name,
+    p_email: order.email,
+    p_phone: order.phone,
+    p_province: order.province,
+    p_canton: order.canton,
+    p_district: order.district,
+    p_address: order.address,
+    p_notes: order.notes,
+
+    p_payment_method: order.payment_method,
+    p_sinpe_reference: order.sinpe_reference,
+    p_delivery_method: order.delivery_method,
+    });
 
     if (error) {
       console.error("ORDER ERROR:", error);
