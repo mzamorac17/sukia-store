@@ -3,7 +3,7 @@ import { Product } from "@/types/product";
 export const product: Product = {
   id: 1,
 
-  collection: "#001",
+  collection: "Colección #001",
 
   name: "OOPHAGA PUMILIO",
 

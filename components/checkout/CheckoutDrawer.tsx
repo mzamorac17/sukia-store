@@ -19,6 +19,8 @@ export default function CheckoutDrawer({
 }: CheckoutDrawerProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [orderSubmitted, setOrderSubmitted] = useState(false);
+
   const [formData, setFormData] = useState({
   fullName: "",
   email: "",
@@ -82,21 +84,8 @@ export default function CheckoutDrawer({
       return;
     }
 
-    alert("Pedido guardado correctamente.");
-
-    setFormData({
-      fullName: "",
-      email: "",
-      phone: "",
-      province: "",
-      canton: "",
-      district: "",
-      address: "",
-      notes: "",
-    });
-
     setIsSubmitting(false);
-    onClose();
+    setOrderSubmitted(true);
   }
 
   return (
@@ -131,8 +120,74 @@ export default function CheckoutDrawer({
                 <X size={18} />
               </button>
             </div>
+            {orderSubmitted ? (
+  <div className="flex flex-1 flex-col items-center justify-center text-center">
+    <p className="text-xs uppercase tracking-[0.35em] text-zinc-500">
+      Pedido recibido
+    </p>
 
-            <div className="mt-12 border-b border-zinc-800 pb-8">
+    <h3 className="mt-5 font-heading text-4xl tracking-[0.12em]">
+      Gracias por tu compra
+    </h3>
+
+    <p className="mt-6 max-w-sm text-sm leading-7 text-zinc-400">
+      Tu orden quedó registrada correctamente. El pago queda pendiente de
+      verificación y te contactaremos por WhatsApp para confirmar el proceso.
+    </p>
+
+    <div className="mt-10 w-full border border-zinc-800 p-5 text-left">
+      <div className="flex justify-between text-sm text-zinc-400">
+        <span>Producto</span>
+        <span className="text-white">{product.name}</span>
+      </div>
+
+      <div className="mt-3 flex justify-between text-sm text-zinc-400">
+        <span>Talla</span>
+        <span className="text-white">{selectedSize}</span>
+      </div>
+
+      <div className="mt-3 flex justify-between text-sm text-zinc-400">
+        <span>Total</span>
+        <span className="text-white">
+          ₡{product.price.toLocaleString("es-CR")}
+        </span>
+      </div>
+
+      <div className="mt-3 flex justify-between text-sm text-zinc-400">
+        <span>Estado</span>
+        <span className="text-white">Pendiente</span>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      onClick={() => {
+        setOrderSubmitted(false);
+
+        setFormData({
+          fullName: "",
+          email: "",
+          phone: "",
+          province: "",
+          canton: "",
+          district: "",
+          address: "",
+          notes: "",
+          paymentMethod: "sinpe",
+          sinpeReference: "",
+          deliveryMethod: "shipping",
+        });
+
+        onClose();
+      }}
+      className="mt-10 w-full rounded-md bg-white py-5 text-sm uppercase tracking-[0.25em] text-black transition hover:bg-zinc-200"
+    >
+      Cerrar
+    </button>
+  </div>
+) : (
+  <> 
+    <div className="mt-12 border-b border-zinc-800 pb-8">
               <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">
                 {product.collection}
               </p>
@@ -296,6 +351,8 @@ export default function CheckoutDrawer({
                 {isSubmitting ? "Guardando..." : "Continuar al pago"}
               </button>
             </form>
+  </>
+)}
           </motion.aside>
         </>
       )}
