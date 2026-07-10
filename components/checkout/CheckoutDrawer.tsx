@@ -101,7 +101,7 @@ export default function CheckoutDrawer({
           />
 
           <motion.aside
-            className="fixed right-0 top-0 z-50 flex h-screen w-full max-w-md flex-col bg-[#080808] px-8 py-8 text-white shadow-2xl"
+            className="fixed right-0 top-0 z-50 flex h-screen w-full max-w-md flex-col overflow-hidden bg-[#080808] px-8 py-8 text-white shadow-2xl"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
@@ -206,9 +206,9 @@ export default function CheckoutDrawer({
             </div>
 
             <form
-              onSubmit={handleSubmit}
-              className="mt-8 flex flex-1 flex-col gap-4"
-            >
+             onSubmit={handleSubmit}
+            className="mt-8 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pr-2"
+           >
               <input
                 name="fullName"
                 value={formData.fullName}
@@ -343,13 +343,13 @@ export default function CheckoutDrawer({
                 className="resize-none border border-zinc-800 bg-transparent px-4 py-4 text-sm outline-none transition placeholder:text-zinc-600 focus:border-white"
               />
 
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="mt-auto w-full rounded-md bg-white py-5 text-sm uppercase tracking-[0.25em] text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {isSubmitting ? "Guardando..." : "Continuar al pago"}
-              </button>
+            <button
+             type="submit"
+             disabled={isSubmitting}
+            className="sticky bottom-0 mt-4 w-full rounded-md bg-white py-5 text-sm uppercase tracking-[0.25em] text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+  {isSubmitting ? "Guardando..." : "Continuar al pago"}
+</button>
             </form>
   </>
 )}
