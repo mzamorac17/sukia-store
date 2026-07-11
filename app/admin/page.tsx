@@ -1,3 +1,5 @@
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -14,6 +16,13 @@ if (!supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default async function AdminPage() {
+    const cookieStore = await cookies();
+  const isAdmin = cookieStore.get("sukia_admin")?.value === "true";
+
+  if (!isAdmin) {
+    redirect("/admin/login");
+  }
+
   const { data: orders, error } = await supabase
     .from("orders")
     .select("*")
@@ -45,9 +54,20 @@ export default async function AdminPage() {
             </h1>
           </div>
 
+          <div className="flex items-center gap-4">
           <p className="text-sm text-zinc-500">
-            Total: {orders?.length ?? 0}
+          Total: {orders?.length ?? 0}
           </p>
+
+  <form action="/api/admin/logout" method="POST">
+    <button
+      type="submit"
+      className="rounded-full border border-zinc-800 px-4 py-2 text-xs uppercase tracking-[0.2em] text-zinc-400 transition hover:border-white hover:text-white"
+    >
+      Salir
+    </button>
+  </form>
+</div>
         </div>
 
         <div className="mt-10 overflow-x-auto border border-zinc-800">
