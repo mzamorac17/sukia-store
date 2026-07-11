@@ -37,7 +37,7 @@ export default function Hero() {
         </motion.button>
 
         <p className="mt-5 mb-24 text-sm text-zinc-500">
-          Pago seguro con Stripe
+          Pago seguro.
         </p>
       </div>
     <CheckoutDrawer

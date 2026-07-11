@@ -14,7 +14,7 @@ export default function ProductImage() {
         width={620}
         height={620}
         priority
-        className="h-auto w-[520px] transition-transform duration-500 hover:scale-105"
+        className="h-auto w-[400px] transition-transform duration-500 hover:scale-105"
       />
     </motion.div>
   );

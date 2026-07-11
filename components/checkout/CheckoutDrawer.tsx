@@ -75,7 +75,8 @@ export default function CheckoutDrawer({
       delivery_method: formData.deliveryMethod,
     };
 
-    const { error } = await supabase.rpc("create_order_with_inventory", {
+    const { data: orderId, error } = await supabase.rpc(
+    "create_order_with_inventory", {
     p_product_id: order.product_id,
     p_product_name: order.product_name,
     p_selected_size: order.selected_size,
@@ -102,6 +103,33 @@ export default function CheckoutDrawer({
       return;
     }
 
+    if (formData.paymentMethod === "card") {
+  const response = await fetch("/api/checkout", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      orderId,
+      productName: product.name,
+      selectedSize,
+      price: product.price,
+      email: formData.email,
+    }),
+  });
+
+  const checkoutData = await response.json();
+
+  if (!response.ok || !checkoutData.url) {
+    console.error("STRIPE ERROR:", checkoutData);
+    alert("No se pudo iniciar el pago con tarjeta.");
+    setIsSubmitting(false);
+    return;
+  }
+
+  window.location.href = checkoutData.url;
+  return;
+}
     setIsSubmitting(false);
     setOrderSubmitted(true);
   }
@@ -316,7 +344,7 @@ export default function CheckoutDrawer({
 >
   <option value="sinpe">SINPE Móvil</option>
   <option value="cash">Efectivo / retiro local</option>
-  <option value="card">Tarjeta, próximamente</option>
+  <option value="card">Tarjeta</option>
 </select>
 
 {formData.paymentMethod === "sinpe" && (

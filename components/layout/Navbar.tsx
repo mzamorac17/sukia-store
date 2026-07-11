@@ -10,13 +10,13 @@ export default function Navbar() {
       <Image
         src="/Logo.png"
         alt="SUKIA"
-        width={210}
+        width={220}
         height={60}
         priority
-        className="h-auto w-[580px] opacity-90"
+        className="h-auto w-[480px] opacity-100"
       />
 
-      <div className="w-24" />
+      <div className="w-12 justify-center" />
     </nav>
   );
 }
