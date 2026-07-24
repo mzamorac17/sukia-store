@@ -343,7 +343,6 @@ export default function CheckoutDrawer({
   className="border border-zinc-800 bg-[#080808] px-4 py-4 text-sm outline-none transition text-white focus:border-white"
 >
   <option value="sinpe">SINPE Móvil</option>
-  <option value="cash">Efectivo / retiro local</option>
   <option value="card">Tarjeta</option>
 </select>
 

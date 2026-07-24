@@ -28,7 +28,7 @@ export async function POST(request: Request) {
               name: body.productName,
               description: `Talla: ${body.selectedSize}`,
             },
-            unit_amount: body.price,
+            unit_amount: body.price * 100,
           },
           quantity: 1,
         },
