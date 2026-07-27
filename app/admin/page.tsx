@@ -2,18 +2,18 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
 
 if (!supabaseUrl) {
   throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL");
 }
 
-if (!supabaseKey) {
+if (!supabaseServiceRoleKey) {
   throw new Error("Missing NEXT_PUBLIC_SUPABASE_ANON_KEY");
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 
 export default async function AdminPage() {
     const cookieStore = await cookies();
@@ -84,6 +84,7 @@ export default async function AdminPage() {
                 <th className="px-4 py-4">Comprobante</th>
                 <th className="px-4 py-4">Estado pago</th>
                 <th className="px-4 py-4">Estado pedido</th>
+                <th className="px-4 py-4">Acciones</th>
                 <th className="px-4 py-4">Dirección</th>
                 <th className="px-4 py-4">Notas</th>
               </tr>
@@ -146,6 +147,68 @@ export default async function AdminPage() {
                     </span>
                   </td>
 
+<td className="px-4 py-4">
+  <div className="flex min-w-[180px] flex-col gap-2">
+    {order.payment_status !== "paid" && (
+      <form action="/api/admin/orders/update-status" method="POST">
+        <input type="hidden" name="orderId" value={order.id} />
+        <input type="hidden" name="action" value="mark_paid" />
+
+        <button
+          type="submit"
+          className="w-full rounded-md border border-green-700/60 px-3 py-2 text-xs uppercase tracking-[0.15em] text-green-400 transition hover:border-green-400 hover:text-green-300"
+        >
+          Marcar pagado
+        </button>
+      </form>
+    )}
+
+    {order.order_status !== "shipped" &&
+      order.order_status !== "delivered" &&
+      order.order_status !== "cancelled" && (
+        <form action="/api/admin/orders/update-status" method="POST">
+          <input type="hidden" name="orderId" value={order.id} />
+          <input type="hidden" name="action" value="mark_shipped" />
+
+          <button
+            type="submit"
+            className="w-full rounded-md border border-blue-700/60 px-3 py-2 text-xs uppercase tracking-[0.15em] text-blue-400 transition hover:border-blue-400 hover:text-blue-300"
+          >
+            Marcar enviado
+          </button>
+        </form>
+      )}
+
+    {order.order_status !== "delivered" &&
+      order.order_status !== "cancelled" && (
+        <form action="/api/admin/orders/update-status" method="POST">
+          <input type="hidden" name="orderId" value={order.id} />
+          <input type="hidden" name="action" value="mark_delivered" />
+
+          <button
+            type="submit"
+            className="w-full rounded-md border border-zinc-700 px-3 py-2 text-xs uppercase tracking-[0.15em] text-zinc-300 transition hover:border-white hover:text-white"
+          >
+            Entregado
+          </button>
+        </form>
+      )}
+
+    {order.order_status !== "cancelled" && (
+      <form action="/api/admin/orders/update-status" method="POST">
+        <input type="hidden" name="orderId" value={order.id} />
+        <input type="hidden" name="action" value="cancel_order" />
+
+        <button
+          type="submit"
+          className="w-full rounded-md border border-red-800/70 px-3 py-2 text-xs uppercase tracking-[0.15em] text-red-400 transition hover:border-red-400 hover:text-red-300"
+        >
+          Cancelar
+        </button>
+      </form>
+    )}
+  </div>
+</td>
                   <td className="px-4 py-4 text-xs text-zinc-400">
                     <div>{order.province}</div>
                     <div>{order.canton}</div>
@@ -162,7 +225,7 @@ export default async function AdminPage() {
               {orders?.length === 0 && (
                 <tr>
                   <td
-                    colSpan={12}
+                    colSpan={13}
                     className="px-4 py-10 text-center text-zinc-500"
                   >
                     Todavía no hay pedidos.

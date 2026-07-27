@@ -75,8 +75,13 @@ export default function CheckoutDrawer({
       delivery_method: formData.deliveryMethod,
     };
 
-    const { data: orderId, error } = await supabase.rpc(
-    "create_order_with_inventory", {
+    const orderFunction =
+  formData.paymentMethod === "card"
+    ? "create_order_without_inventory"
+    : "create_order_with_inventory";
+
+const { data: orderId, error } = await supabase.rpc(
+  orderFunction, {
     p_product_id: order.product_id,
     p_product_name: order.product_name,
     p_selected_size: order.selected_size,
@@ -94,7 +99,8 @@ export default function CheckoutDrawer({
     p_payment_method: order.payment_method,
     p_sinpe_reference: order.sinpe_reference,
     p_delivery_method: order.delivery_method,
-    });
+    }
+  );
 
     if (error) {
       console.error("ORDER ERROR:", error);

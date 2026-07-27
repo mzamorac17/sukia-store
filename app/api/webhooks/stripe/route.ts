@@ -2,11 +2,11 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
 
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY ?? "";
 const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET ?? "";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
 
 if (!stripeSecretKey) {
   throw new Error("Missing STRIPE_SECRET_KEY");
@@ -58,7 +58,6 @@ export async function POST(request: Request) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
-
     const orderId = session.metadata?.order_id;
 
     if (!orderId) {
@@ -68,7 +67,23 @@ export async function POST(request: Request) {
       );
     }
 
-    const { error } = await supabaseAdmin
+    const { error: inventoryError } = await supabaseAdmin.rpc(
+      "decrease_inventory_for_order",
+      {
+        p_order_id: orderId,
+      }
+    );
+
+    if (inventoryError) {
+      console.error("INVENTORY UPDATE ERROR:", inventoryError);
+
+      return NextResponse.json(
+        { error: "Could not update inventory" },
+        { status: 500 }
+      );
+    }
+
+    const { error: orderUpdateError } = await supabaseAdmin
       .from("orders")
       .update({
         payment_status: "paid",
@@ -76,8 +91,8 @@ export async function POST(request: Request) {
       })
       .eq("id", orderId);
 
-    if (error) {
-      console.error("SUPABASE UPDATE ERROR:", error);
+    if (orderUpdateError) {
+      console.error("SUPABASE ORDER UPDATE ERROR:", orderUpdateError);
 
       return NextResponse.json(
         { error: "Could not update order" },
